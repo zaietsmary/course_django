@@ -49,34 +49,24 @@
     </tbody>
   </table>
 
-  {% if employees.has_other_pages %}
-  <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-      {% if employees.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo; First</a>
-      </li>
-      <li class="page-item">
-        <a class="page-link" href="?page={{ employees.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a>
-      </li>
-      {% endif %}
 
-      <li class="page-item disabled">
-        <span class="page-link">Page {{ employees.number }} of {{ employees.paginator.num_pages }}</span>
-      </li>
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
 
-      {% if employees.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ employees.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
-      </li>
-      <li class="page-item">
-        <a class="page-link" href="?page={{ employees.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Last &raquo;</a>
-      </li>
-      {% endif %}
-    </ul>
-  </nav>
-  {% endif %}
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
 
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 
 </div>
 {% endblock %}
