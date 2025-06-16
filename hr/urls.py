@@ -1,7 +1,8 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
-# from hr.views import generic_views as views
-from hr.views import class_views as views
+from hr.views import generic_views as views
+#from hr.views import class_views as views
 
 urlpatterns = [
     path("employees/", views.EmployeeListView.as_view(), name="employee_list"),
@@ -18,6 +19,10 @@ urlpatterns = [
         views.EmployeeDeleteView.as_view(),
         name="employee_delete",
     ),
+    path(
+        "employees/<int:pk>/",
+        views.EmployeeDetailView.as_view(),
+        name="employee_detail"),
 ]
 
 # from hr.views.function_views import (

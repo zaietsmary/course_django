@@ -1,0 +1,21 @@
+<h1>Профіль працівника</h1>
+
+<p><strong>Ім’я:</strong> {{ employee.first_name }}</p>
+<p><strong>Прізвище:</strong> {{ employee.last_name }}</p>
+<p><strong>Email:</strong> {{ employee.email }}</p>
+<p><strong>Дата народження:</strong> {{ employee.birth_date }}</p>
+<p><strong>Дата найму:</strong> {{ employee.hire_date }}</p>
+
+{% if employee.position %}
+  <p><strong>Посада:</strong> {{ employee.position.title }}</p>
+  <p><strong>Відділ:</strong> {{ employee.position.department.name }}</p>
+{% endif %}
+
+<hr>
+
+{% if is_superadmin %}
+  <a href="{% url 'employee_update' employee.pk %}">Редагувати</a> |
+  <a href="{% url 'employee_delete' employee.pk %}">Видалити</a>
+{% endif %}
+
+<p><a href="{% url 'employee_list' %}">← Назад до списку працівників</a></p>

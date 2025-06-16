@@ -8,19 +8,32 @@ from django.views.generic import (
     UpdateView,
     DetailView,
 )
-
+from django.views.generic import DetailView
 from hr.forms import EmployeeForm
 from hr.models import Employee
-
+from django.core.paginator import Paginator
 
 def user_is_superadmin(user) -> bool:
     return user.is_superuser
 
+class EmployeeDetailView(UserPassesTestMixin, DetailView):
+    model = Employee
+    template_name = "employee_detail.html"
+    context_object_name = "employee"
+
+    def test_func(self):
+        return self.request.user.is_authenticated
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_superadmin"] = user_is_superadmin(self.request.user)
+        return context
 
 class EmployeeListView(ListView):
     model = Employee
     template_name = "employee_list.html"
     context_object_name = "employees"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -30,7 +43,8 @@ class EmployeeListView(ListView):
             queryset = queryset.filter(
                 Q(first_name__icontains=search)
                 | Q(last_name__icontains=search)
-                | Q(position__title__icontains=search),
+                | Q(position__title__icontains=search)
+                | Q(email__icontains=search),
             )
         return queryset
 
