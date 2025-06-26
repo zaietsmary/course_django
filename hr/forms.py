@@ -18,7 +18,7 @@ class EmployeeForm(forms.ModelForm):
 
 
 class SalaryForm(forms.Form):
-    employee = forms.ModelChoiceField(queryset=Employee.objects.all())
+    employee = forms.ModelChoiceField(queryset=Employee.objects.all(), required=True)
 
     def __init__(self, *args, **kwargs):
         super(SalaryForm, self).__init__(*args, **kwargs)
@@ -42,3 +42,32 @@ class SalaryForm(forms.Form):
                     choices=WorkDayChoices,
                     initial=WorkDayEnum.WORKING_DAY.name,
                 )
+    def clean_employee(self):
+        employee = self.cleaned_data.get('employee')
+        if not employee:
+            raise forms.ValidationError('Поле Employee: Переконайтеся, що поле employee заповнено.')
+        return employee
+
+    def clean(self):
+        cleaned_data = super().clean()
+        sick_count = 0
+        holiday_count = 0
+
+        for name, value in cleaned_data.items():
+            if name.startswith('day_'):
+                if value == WorkDayEnum.SICK_DAY.name:
+                    sick_count += 1
+                elif value == WorkDayEnum.HOLIDAY.name:
+                    holiday_count += 1
+
+        if sick_count > 5:
+            raise forms.ValidationError(
+                f'Кількість лікарняних днів не може перевищувати 5. Ви вибрали {sick_count}.'
+            )
+
+        if holiday_count > 3:
+            raise forms.ValidationError(
+                f'Кількість святкових днів не може перевищувати 3. Ви вибрали {holiday_count}.'
+            )
+
+        return cleaned_data

@@ -92,5 +92,6 @@ class SalaryCalculatorView(UserIsAdminMixin, FormView):
             context={
                 'form': form,
                 'calculated_salary': salary,
+                'employee': employee,
             },
         )
