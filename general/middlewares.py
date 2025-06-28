@@ -28,3 +28,14 @@ class RequestStatisticsMiddleware(MiddlewareMixin):
 
             stats.requests += 1
             stats.save()
+
+    def process_exception(self, request, exception):
+        if request.user.is_authenticated and not request.path.startswith(
+                "/hr_super_secret_admin/"
+        ):
+            stats, created = RequestStatistics.objects.get_or_create(user=request.user)
+
+            stats.exception += 1
+            stats.save()
+
+        logger.error(f"Exception occurred for user {request.user}: {exception}")
