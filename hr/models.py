@@ -7,10 +7,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Company(models.Model):
-    name = models.CharField(max_length=100)
-    address = models.CharField(max_length=200)
-    email = models.EmailField()
-    tax_code = models.CharField(max_length=200)
+    name = models.CharField(max_length=100, verbose_name=_('Company name'))
+    address = models.CharField(max_length=200, verbose_name=_('Company address'))
+    email = models.EmailField(verbose_name=_('Company email'))
+    tax_code = models.CharField(max_length=200, verbose_name=_('Company tax code'))
 
     def __str(self):
         return self.name
@@ -22,9 +22,9 @@ class Company(models.Model):
 
 
 class Department(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name=_('Department name'))
     parent_department = models.ForeignKey(
-        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        'self', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Parent department'),
     )
 
     def __str__(self):
@@ -32,12 +32,12 @@ class Department(models.Model):
 
 
 class Position(models.Model):
-    title = models.CharField(verbose_name=_('Title'), max_length=200)
-    department = models.ForeignKey('Department', on_delete=models.CASCADE)
-    is_manager = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    job_description = models.CharField(verbose_name=_('Job Description'), max_length=500, default='')
-    monthly_rate = models.IntegerField(default=0)
+    title = models.CharField(max_length=100, verbose_name=_('Title'))
+    department = models.ForeignKey('Department', on_delete=models.CASCADE, verbose_name=_('Department'))
+    is_manager = models.BooleanField(default=False, verbose_name=_('Is manager'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
+    job_description = models.TextField(verbose_name=_('Job Description'))
+    monthly_rate = models.IntegerField(default=0, verbose_name=_('Monthly rate'))
 
     def save(self, *args, **kwargs):
         if self.is_manager:
