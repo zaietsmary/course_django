@@ -3,10 +3,12 @@ from django.views.decorators.cache import cache_page
 
 from hr.views import generic_views as views
 
-
 urlpatterns = [
-    path('employees/', cache_page(60, cache='my_key', key_prefix='employee_list')(views.EmployeeListView.as_view()),
-         name='employee_list'),
+    path(
+        'employees/',
+        cache_page(60, cache='my_key', key_prefix='employee_list')(views.EmployeeListView.as_view()),
+        name='employee_list',
+    ),
     path(
         'employees/create/',
         views.EmployeeCreateView.as_view(),
@@ -24,7 +26,7 @@ urlpatterns = [
     ),
     path(
         'employees/profile/<int:pk>/',
-        views.EmployeeProfileView.as_view(),
+        cache_page(180, cache='my_key', key_prefix='employee_list')(views.EmployeeProfileView.as_view()),
         name='employee_profile',
     ),
     path(

@@ -10,7 +10,7 @@ python = "^3.11"
 django = "^4.2.6"
 faker = "^24.9.0"
 django-modeltranslation = "^0.18.11"
-pillow = "^10.3.0"
+pillow = "^11.3.0"
 
 
 [build-system]
