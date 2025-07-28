@@ -13,7 +13,7 @@ class Company(models.Model):
     email = models.EmailField()
     tax_code = models.CharField(max_length=200)
 
-    def __str(self):
+    def __str__(self):
         return self.name
 
     @cached_property
@@ -37,7 +37,6 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Position(models.Model):
     title = models.CharField(verbose_name=_("Title"), max_length=200)

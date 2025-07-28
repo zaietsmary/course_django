@@ -7,3 +7,4 @@ class HrConfig(AppConfig):
 
     def ready(self):
         import hr.signals
+
