@@ -5,7 +5,7 @@ from rest_framework.test import (
     APITestCase,
 )
 
-from hr.models import Employee, Position
+from hr.models import Employee, Position, Department
 from hr.tests.factories import (
     EmployeeFactory,
     PositionFactory,
@@ -75,9 +75,10 @@ class PositionViewSetTestCase(APITestCase):
         self.assertEqual(response.data['id'], self.position.pk)
 
     def test_create_position(self):
+        department = Department.objects.create(name='Engineering')
         data = {
             'title': 'Developer',
-            'department': 'Engineering',
+            'department': department.id,
             'is_manager': False,
             'is_active': True,
             'job_description': 'Writing code',
