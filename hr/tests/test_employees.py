@@ -93,3 +93,124 @@ class EmployeeCreateViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Працівника успішно створено.')
 
+class EmployeeProfileViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = EmployeeFactory(is_staff=True, is_superuser=True)
+        self.non_admin_user = EmployeeFactory(is_staff=False, is_superuser=False)
+        self.employees = EmployeeFactory.create_batch(10)
+        self.position = PositionFactory()
+        self.employee = self.employees[0]
+        self.url = reverse('hr:employee_profile', kwargs={'pk': self.employee.pk})
+
+    def test_access(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_non_access(self):
+        self.client.force_login(self.non_admin_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_profile_content(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.url)
+        self.assertContains(response, self.employee.first_name)
+        self.assertContains(response, self.employee.last_name)
+
+    def test_template(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'employee_profile.html')
+
+    def test_context(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.url)
+        self.assertIn('object', response.context)
+        self.assertEqual(response.context['object'], self.employee)
+
+class EmployeeDeleteViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = EmployeeFactory(is_staff=True, is_superuser=True)
+        self.non_admin_user = EmployeeFactory(is_staff=False, is_superuser=False)
+        self.employees = EmployeeFactory.create_batch(10)
+        self.position = PositionFactory()
+        self.employee = self.employees[0]
+        self.url = reverse('hr:employee_delete', kwargs={'pk': self.employee.pk})
+        self.client.force_login(self.admin_user)
+
+    def test_access(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_non_access(self):
+        self.client.force_login(self.non_admin_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'employee_confirm_delete.html')
+
+    def test_delete_employee(self):
+        self.client.force_login(self.admin_user)
+        employee_to_delete = self.employee
+        url = reverse('hr:employee_delete', kwargs={'pk': employee_to_delete.pk})
+        response = self.client.post(url)
+        self.assertRedirects(response, reverse('hr:employee_list'))
+        self.assertFalse(Employee.objects.filter(pk=employee_to_delete.pk).exists())
+
+    def test_context(self):
+        response = self.client.get(self.url)
+        self.assertIn('object', response.context)
+        self.assertEqual(response.context['object'], self.employee)
+
+
+class EmployeeUpdateViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = EmployeeFactory(is_staff=True, is_superuser=True)
+        self.non_admin_user = EmployeeFactory(is_staff=False, is_superuser=False)
+        self.employees = EmployeeFactory.create_batch(10)
+        self.position = PositionFactory()
+        self.employee = self.employees[0]
+        self.url = reverse('hr:employee_update', kwargs={'pk': self.employee.pk})
+        self.client.force_login(self.admin_user)
+
+    def test_access(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_non_access(self):
+        self.client.force_login(self.non_admin_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'employee_form.html')
+
+    def test_update_employee(self):
+        self.client.force_login(self.admin_user)
+        employee_to_update = self.employee
+        url = reverse('hr:employee_update', kwargs={'pk': employee_to_update.pk})
+        updated_data = {
+            'username': 'newuser',
+            'first_name': 'newfirst',
+            'last_name': 'Doe',
+            'email': 'johndoe@example.com',
+            'position': self.position.id,
+        }
+        response = self.client.post(url, updated_data)
+        self.assertRedirects(response, reverse('hr:employee_list'))
+        employee_to_update.refresh_from_db()
+        self.assertEqual(employee_to_update.first_name, 'newfirst')
+
+    def test_context(self):
+        response = self.client.get(self.url)
+        self.assertIn('object', response.context)
+        self.assertEqual(response.context['object'], self.employee)
