@@ -120,7 +120,7 @@ DATABASES = {
         'NAME': 'course_db',
         'USER': 'course_user',
         'PASSWORD': 'course_password',
-        'HOST': 'db',  # назва сервісу PostgreSQL у docker-compose
+        'HOST': 'localhost',  # назва сервісу PostgreSQL у docker-compose
         'PORT': 5432,
     },
 }
